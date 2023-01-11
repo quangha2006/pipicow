@@ -4,9 +4,7 @@ import socket
 from time import sleep
 from picozero import pico_temp_sensor, pico_led
 import machine
-
-ssid = 'YOUR_SSID'
-password = 'YOUR_PASSWORD'
+import secrets
 
 def systemInfo():
     print(sys.implementation)
@@ -16,7 +14,7 @@ def connect():
     ip = ''
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
-    wlan.connect(ssid, password)
+    wlan.connect(secrets.ssid, secrets.password)
     wait = 50
     wlanstatus = None
     wlanNewStatus = None
@@ -37,7 +35,7 @@ def connect():
     if wlan.isconnected() == False:
         print('wifi connection failed!')
     else:
-        print('Connected to SSID..:', ssid)
+        print('Connected to SSID..:', secrets.ssid)
         print('IPv4 Address.......:', wlan.ifconfig()[0])
         print('Subnet Mask........:', wlan.ifconfig()[1])
         print('Default Gateway....:', wlan.ifconfig()[2])
