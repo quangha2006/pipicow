@@ -34,7 +34,9 @@ def connect():
     # Handle connection error
     if wlan.isconnected() == False:
         print('wifi connection failed!')
+        pico_led.off()
     else:
+        pico_led.on()
         print('Connected to SSID..:', secrets.ssid)
         print('IPv4 Address.......:', wlan.ifconfig()[0])
         print('Subnet Mask........:', wlan.ifconfig()[1])
@@ -56,11 +58,16 @@ def serve(connection):
     pico_led.on()
     temperature = 0
     while True:
-        client = connection.accept()[0]
-        request = client.recv(1024)
+        print('Waiting for new connection...')
+        (clientConnection, clientAddress) = connection.accept()
+        request = clientConnection.recv(1024)
         request = str(request)
+        print('Accepted connect from: ', clientAddress)
         try:
-            request = request.split()[1]
+            request = request.split()
+            #for i in request:
+            #    print(i)
+            request = request[1]
         except IndexError:
             pass
         if request == '/lighton?':
@@ -71,8 +78,8 @@ def serve(connection):
             state = 'OFF'
         temperature = pico_temp_sensor.temp
         html = webpage(temperature, state)
-        client.send(html)
-        client.close()
+        clientConnection.send(html.encode())
+        clientConnection.close()
 
 def webpage(temperature, state):
     #Template HTML
