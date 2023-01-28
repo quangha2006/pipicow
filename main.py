@@ -5,6 +5,7 @@ from time import sleep
 from picozero import pico_temp_sensor, pico_led
 import machine
 import secrets
+import st7789v
 
 def systemInfo():
     print(sys.implementation)
@@ -58,7 +59,7 @@ def serve(connection):
     pico_led.on()
     temperature = 0
     while True:
-        print('Waiting for new connection...')
+        print('Waiting for connection...')
         (clientConnection, clientAddress) = connection.accept()
         request = clientConnection.recv(1024)
         request = str(request)
@@ -100,9 +101,10 @@ def webpage(temperature, state):
     return str(html)
 
 try:
-    ip = connect()
-    if ip != '':
-        connection = open_socket(ip)
-        serve(connection)
+#    ip = connect()
+#    if ip != '':
+#        connection = open_socket(ip)
+#        serve(connection)
+    st7789v.Start()
 except KeyboardInterrupt:
     machine.reset()
