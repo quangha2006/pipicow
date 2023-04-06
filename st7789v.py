@@ -66,7 +66,7 @@ def connectWifi(tft):
     return ip
     
 def InitDisplay():
-    spi = SPI(1, baudrate=31250000, sck=Pin(CLK_PIN), mosi=Pin(DIN_PIN))
+    spi = SPI(1, baudrate=40000000, sck=Pin(CLK_PIN), mosi=Pin(DIN_PIN))
     tft = st7789.ST7789(spi, 240, 320,
         reset=Pin(RESET_PIN, Pin.OUT),
         cs=Pin(CS_PIN, Pin.OUT),
@@ -164,7 +164,9 @@ def GetTime(tft, ip, run_button,ens160):
     RenderRec(tft,0,0,240,32,[134,156,152])
     Render(tft, "QUANG HA", 60, 0, font_L_B, [255,255,255], [134,156,152])
     while True:
-        RenderRec(tft,33,0,240,320,[0,0,0])
+        #tft.fill(st7789.BLACK)
+        #RenderRec(tft,0,0,240,32,[134,156,152])
+        #Render(tft, "QUANG HA", 60, 0, font_L_B, [255,255,255], [134,156,152])
         currentTime = utime.localtime()
         #format: web, 25 May, 2023
         date_string = "{},{} {},{}".format(WeekFromInt(currentTime[6]),currentTime[2], MonthFromInt(currentTime[1]), currentTime[0])
@@ -187,9 +189,9 @@ def GetTime(tft, ip, run_button,ens160):
         aqi = ens160.aqi
         tvoc = ens160.tvoc
         eco2 = ens160.eco2
-        AQI = "AQI: {} [{}]".format(str(aqi.value),str(aqi.rating))
+        AQI = "AQI: {} [{}]        ".format(str(aqi.value),str(aqi.rating))
         TVOC = "TVOC: {} ppb".format(str(tvoc))
-        eCO2 = "eCO2: {} ppm [{}]".format(str(eco2.value), str(eco2.rating))
+        eCO2 = "eCO2: {} ppm [{}]         ".format(str(eco2.value), str(eco2.rating))
         Status = "Status: {}".format(ens160.operation)
         Render(tft, AQI, 10, 198)
         Render(tft, TVOC, 10, 216)
@@ -218,3 +220,4 @@ def Start(run_button):
     ip = connectWifi(tft)
     InitTime(ip)
     GetTime(tft, ip, run_button, ens160)
+
