@@ -151,6 +151,12 @@ def InitSensor():
     sda=Pin(6)
     sensor = PiicoDev_ENS160(bus=1, scl=scl, sda=sda, freq=100000)
     return sensor
+
+def InitBMP280():
+    bus = I2C(0,scl=Pin(1),sda=Pin(0),freq=200000)
+    bmp = BMP280(bus)
+    bmp.use_case(BMP280_CASE_INDOOR)
+    return bmp
     
 def GetTime(tft, ip, run_button,ens160):
     tft.fill(st7789.BLACK)
@@ -158,6 +164,7 @@ def GetTime(tft, ip, run_button,ens160):
     RenderRec(tft,0,0,240,32,[134,156,152])
     Render(tft, "QUANG HA", 60, 0, font_L_B, [255,255,255], [134,156,152])
     while True:
+        RenderRec(tft,33,0,240,320,[0,0,0])
         currentTime = utime.localtime()
         #format: web, 25 May, 2023
         date_string = "{},{} {},{}".format(WeekFromInt(currentTime[6]),currentTime[2], MonthFromInt(currentTime[1]), currentTime[0])
@@ -188,6 +195,18 @@ def GetTime(tft, ip, run_button,ens160):
         Render(tft, TVOC, 10, 216)
         Render(tft, eCO2, 10, 234)
         Render(tft, Status, 10, 252)
+        # ReadBMP
+        #pressure=bmp.pressure
+        #p_bar=pressure/100000
+        #p_mmHg=pressure/133.3224
+        #temperature=bmp.temperature
+        #print("Temperature: {} C".format(temperature))
+        #print("Pressure: {} Pa, {} bar, {} mmHg".format(pressure,p_bar,p_mmHg))    pressure=bmp.pressure
+        #p_bar=pressure/100000
+        #p_mmHg=pressure/133.3224
+        #temperature=bmp.temperature
+        #print("Temperature: {} C".format(temperature))
+        #print("Pressure: {} Pa, {} bar, {} mmHg".format(pressure,p_bar,p_mmHg))
         sleep(1.0)
         if run_button.value() == 1:
             return
@@ -195,6 +214,7 @@ def GetTime(tft, ip, run_button,ens160):
 def Start(run_button):
     tft = InitDisplay()
     ens160 = InitSensor()
+    #bmp = InitBMP280()
     ip = connectWifi(tft)
     InitTime(ip)
     GetTime(tft, ip, run_button, ens160)
