@@ -10,6 +10,7 @@ import time
 from ds3231_port import DS3231
 import utime
 import machine
+import aht
 
 BACKLIGHT_PIN = 10
 RESET_PIN = 11
@@ -158,15 +159,12 @@ def InitBMP280():
     bmp.use_case(BMP280_CASE_INDOOR)
     return bmp
     
-def GetTime(tft, ip, run_button,ens160):
+def GetTime(tft, ip, run_button,ens160,aht_sensor):
     tft.fill(st7789.BLACK)
     #Screen not change
     RenderRec(tft,0,0,240,32,[134,156,152])
     Render(tft, "QUANG HA", 60, 0, font_L_B, [255,255,255], [134,156,152])
     while True:
-        #tft.fill(st7789.BLACK)
-        #RenderRec(tft,0,0,240,32,[134,156,152])
-        #Render(tft, "QUANG HA", 60, 0, font_L_B, [255,255,255], [134,156,152])
         currentTime = utime.localtime()
         #format: web, 25 May, 2023
         date_string = "{},{} {},{}".format(WeekFromInt(currentTime[6]),currentTime[2], MonthFromInt(currentTime[1]), currentTime[0])
@@ -186,6 +184,8 @@ def GetTime(tft, ip, run_button,ens160):
         volString = "Voltage: {:.2f}".format(voltage)
         Render(tft, volString, 10, 180)
         # Read from the sensor
+        ens160.temperature = aht_sensor.temperature
+        ens160.humidity = aht_sensor.humidity
         aqi = ens160.aqi
         tvoc = ens160.tvoc
         eco2 = ens160.eco2
@@ -193,10 +193,15 @@ def GetTime(tft, ip, run_button,ens160):
         TVOC = "TVOC: {} ppb".format(str(tvoc))
         eCO2 = "eCO2: {} ppm [{}]         ".format(str(eco2.value), str(eco2.rating))
         Status = "Status: {}".format(ens160.operation)
+        temperature = "Temperature: {} ".format(ens160.temperature)
+        humidity = "humidity: {}".format(ens160.humidity)
+
         Render(tft, AQI, 10, 198)
         Render(tft, TVOC, 10, 216)
         Render(tft, eCO2, 10, 234)
         Render(tft, Status, 10, 252)
+        Render(tft, temperature, 10, 270)
+        Render(tft, humidity, 10, 288)
         # ReadBMP
         #pressure=bmp.pressure
         #p_bar=pressure/100000
@@ -216,8 +221,8 @@ def GetTime(tft, ip, run_button,ens160):
 def Start(run_button):
     tft = InitDisplay()
     ens160 = InitSensor()
+    aht_sensor = aht.AHT2x(I2C(id=1,scl=Pin(7), sda=Pin(6), freq=100000), crc=True)
     #bmp = InitBMP280()
     ip = connectWifi(tft)
     InitTime(ip)
-    GetTime(tft, ip, run_button, ens160)
-
+    GetTime(tft, ip, run_button, ens160, aht_sensor)
