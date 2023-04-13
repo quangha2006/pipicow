@@ -2,7 +2,7 @@ from micropython import const
 from ustruct import unpack as unp
 
 # Author David Stenwall (david at stenwall.io)
-
+# https://electrocredible.com/bmp280-raspberry-pi-pico-micropython-guide/
 # Power Modes
 BMP280_POWER_SLEEP = const(0)
 BMP280_POWER_FORCED = const(1)
