@@ -1,3 +1,5 @@
+# document: https://www.coderdojotc.org/micropython/displays/graph/14-lcd-st7789V/#uploading-the-st7789v-python-firmware
+# https://github.com/russhughes/st7789_mpy
 from machine import Pin, SPI, I2C, RTC, ADC
 import st7789
 from time import sleep
@@ -37,98 +39,6 @@ common_sda=Pin(4)
 common_freq=400000
 common_id=0
 common_i2c=I2C(id=common_id,scl=common_scl, sda=common_sda, freq=common_freq)
-
-def connectWifi(tft):
-    #Connect to WLAN
-    ip = ''
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active(True)
-    wlan.connect(secrets.ssid, secrets.password)
-    wait = 50
-    wlanstatus = None
-    wlanNewStatus = None
-    while wlan.isconnected() == False and wait >= 0:
-        if wait % 2 == 0:
-            pico_led.on()
-        else:
-            pico_led.off()
-        wlanNewStatus = wlan.status()
-        #if wlanstatus != wlanNewStatus:
-        wlanstatus = wlanNewStatus
-        Render(tft, "Waiting for connection...{}".format(wait), 10, 18)
-        if wlanNewStatus < 0 or wlanNewStatus >= 3:
-            Render(tft, "wifi connection failed!", 10, 36)
-            break
-        wait -= 1
-        sleep(0.2)
-    # Handle connection error
-    if wlan.isconnected() == False:
-        Render(tft, "wifi connection failed!", 10, 36)
-        pico_led.off()
-    else:
-        pico_led.on()
-        Render(tft, "Connected: {}".format(secrets.ssid), 10, 36)
-        Render(tft, "IP.......: {}".format(wlan.ifconfig()[0]), 10, 54)
-        Render(tft, "Mac......: {}".format(wlan.ifconfig()[1]), 10, 72) 
-        Render(tft, "Gateway..: {}".format(wlan.ifconfig()[2]), 10, 90)
-        ip = wlan.ifconfig()[0]
-    return ip
-    
-def InitDisplay():
-    spi = SPI(1, baudrate=40000000, sck=Pin(CLK_PIN), mosi=Pin(DIN_PIN))
-    tft = st7789.ST7789(spi, 240, 320,
-        reset=Pin(RESET_PIN, Pin.OUT),
-        cs=Pin(CS_PIN, Pin.OUT),
-        dc=Pin(DC_PIN, Pin.OUT),
-        backlight=Pin(BACKLIGHT_PIN, Pin.OUT),
-        rotation=4)
-    tft.init()
-    Render(tft, "Initializing....", 10, 0)
-    return tft
-
-def WeekFromInt(dayinweek):
-    if dayinweek == 0:
-        return "Mon"
-    elif dayinweek == 1:
-        return "Tue"
-    elif dayinweek == 2:
-        return "Web"
-    elif dayinweek == 3:
-        return "Thu"
-    elif dayinweek == 4:
-        return "Fri"
-    elif dayinweek == 5:
-        return "Sat"
-    elif dayinweek == 6:
-        return "Sun"
-    return ""
-        
-def MonthFromInt(monthinyear):
-    if monthinyear == 1:
-        return "Jan"
-    elif monthinyear == 2:
-        return "Feb"
-    elif monthinyear == 3:
-        return "Mar"
-    elif monthinyear == 4:
-        return "Apr"
-    elif monthinyear == 5:
-        return "May"
-    elif monthinyear == 6:
-        return "Jun"
-    elif monthinyear == 7:
-        return "Jul"
-    elif monthinyear == 8:
-        return "Aug"
-    elif monthinyear == 9:
-        return "Sep"
-    elif monthinyear == 10:
-        return "Oct"
-    elif monthinyear == 11:
-        return "Nov"
-    elif monthinyear == 12:
-        return "Dec"
-    return ""
         
 def Render(tft, text, screen_x, screen_y, font_size = font, color = [255,255,255], bg = [0,0,0]):
     tft.text(font_size, text, screen_x, screen_y, st7789.color565(color[0],color[1],color[2]), st7789.color565(bg[0],bg[1],bg[2]))
@@ -136,25 +46,8 @@ def Render(tft, text, screen_x, screen_y, font_size = font, color = [255,255,255
 def RenderRec(tft, x, y, width, height, color = [255,255,255]):
     tft.fill_rect(x, y, width, height, st7789.color565(color[0],color[1],color[2]))
     
-def InitTime(ip):
-    if ip != '':
-        ntptime.host = "1.europe.pool.ntp.org"
-        ntptime.settime()
-        ds3231.save_time()
-    else:
-        ds3231.get_time(True)
-        
-    rtc=machine.RTC()
-    utcNow=utime.time()
-    
-    # 7 hours = 25200 seconds# for gmt. For me gmt+7. 
-    gmt=utcNow+25200
-    
-    # for second to convert time
-    (year, month, mday, hour, minute, second, weekday, yearday)=utime.localtime(gmt)
-    # first 0 = week of year
-    # second 0 = milisecond
-    rtc.datetime((year, month, mday, 0, hour, minute, second, 0))
+
+
 def InitSensor():
     sensor = PiicoDev_ENS160(bus=common_id, scl=common_scl, sda=common_sda, freq=common_freq)
     return sensor
@@ -164,7 +57,7 @@ def InitBMP280():
     bmp.use_case(bmp280.BMP280_CASE_INDOOR)
     return bmp
     
-def RenderScreen(tft, ip, run_button,ens160,aht_sensor,bmp_sensor):
+def RenderScreen(tft, run_button,ens160,aht_sensor,bmp_sensor):
     tft.fill(st7789.BLACK)
     #Screen not change
     RenderRec(tft,0,0,240,32,[134,156,152])
@@ -240,5 +133,5 @@ def Start(run_button):
     print("Init ENS160")
     ens160 = InitSensor()
     print("All Done")
-    RenderScreen(tft, ip, run_button, ens160, aht_sensor, bmp_sensor)
+    RenderScreen(tft, run_button, ens160, aht_sensor, bmp_sensor)
 
