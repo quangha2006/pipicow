@@ -21,7 +21,6 @@ class WIFI:
             wlanStatus = self.wlan.status()
             print("Waiting for connection...{}".format(wait))
             if wlanStatus < 0 or wlanStatus >= 3:
-                print("wifi connection failed!")
                 break
             wait -= 1
             sleep(0.25)
