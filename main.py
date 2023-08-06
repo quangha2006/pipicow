@@ -87,7 +87,7 @@ def InitScreen(display):
     display.FillBlack()
     # Screen not change
     display.RenderRec(0, 0, 240, 32, [134, 156, 152])
-    display.Render("QUANG HA", 60, 0, "LB", color=[
+    display.RenderText("QUANG HA", 60, 0, "LB", color=[
                    255, 255, 255], bg=[134, 156, 152])
 
 
@@ -137,19 +137,21 @@ def loop(display, wifi, ens160_sensor, aht_sensor, bmp_sensor, ds3231):
     bmp_pre = "Pressure: {} Pa, {} bar, {} mmHg".format(
         pressure, p_bar, p_mmHg)
 
-    display.Render(time_string, 60, 38, "LB", [81, 207, 102])
-    display.Render(date_string, 0, 78, "M")
-    display.Render(temp0, 10, beginy)
-    display.Render(temp1, 10, beginy + space * 1)
-    display.Render(volString, 10, beginy + space * 2)
-    display.Render(AQI, 10, beginy + space * 3)
-    display.Render(TVOC, 10, beginy + space * 4)
-    display.Render(eCO2, 10, beginy + space * 5)
-    display.Render(Status, 10, beginy + space * 6)
-    display.Render(temperature, 10, beginy + space * 7)
-    display.Render(humidity, 10, beginy + space * 8)
-    display.Render(bmp_tem, 10, beginy + space * 9)
-    display.Render(bmp_pre, 10, beginy + space * 10)
+
+    #display.RenderRec(0,33,240,48,[0,0,0])
+    display.RenderText(time_string, 10, 50, "LB", [81, 207, 102])
+    display.RenderText(date_string, 0, 78, "M")
+    display.RenderText(temp0, 10, beginy)
+    display.RenderText(temp1, 10, beginy + space * 1)
+    display.RenderText(volString, 10, beginy + space * 2)
+    display.RenderText(AQI, 10, beginy + space * 3)
+    display.RenderText(TVOC, 10, beginy + space * 4)
+    display.RenderText(eCO2, 10, beginy + space * 5)
+    display.RenderText(Status, 10, beginy + space * 6)
+    display.RenderText(temperature, 10, beginy + space * 7)
+    display.RenderText(humidity, 10, beginy + space * 8)
+    display.RenderText(bmp_tem, 10, beginy + space * 9)
+    display.RenderText(bmp_pre, 10, beginy + space * 10)
     end_ms = utime.ticks_ms()
     runningTime = end_ms - begin_ms
     utime.sleep_ms(1000 - runningTime)
@@ -178,3 +180,4 @@ try:
 
 except KeyboardInterrupt:
     machine.reset()
+
